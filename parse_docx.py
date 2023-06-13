@@ -17,7 +17,7 @@ def replace_umlauts(text: str) -> str:
 def docx_to_csv(path):
     # Load the first table from your document. In your example file,
     # there is only one table, so I just grab the first one.
-    document = Document('test.docx')
+    document = Document(path)
     table = document.tables[0]
 
     # Data will be a list of rows represented as dictionaries
