@@ -1,5 +1,12 @@
-from docx.api import Document
+import docx2txt
+import re
 import pandas as pd
+import streamlit as st
+
+# REGEX patterns
+speaker_pattern = re.compile(r'[A-ZÄÖÜ ]+:')
+num_pattern = re.compile(r'\d+\/\d+')
+timestamp_pattern = re.compile(r'\d+:\d+:\d+:\d+')
 
 def replace_umlauts(text: str) -> str:
     """replace special German umlauts (vowel mutations) from text. 
@@ -10,42 +17,81 @@ def replace_umlauts(text: str) -> str:
     """
     vowel_char_map = {
         ord('ä'): 'ae', ord('ü'): 'ue', ord('ö'): 'oe', ord('ß'): 'ss',
-        ord('Ä'): 'Ae', ord('Ü'): 'Ue', ord('Ö'): 'Oe'
+        ord('Ä'): 'AE', ord('Ü'): 'UE', ord('Ö'): 'OE'
     }
     return text.translate(vowel_char_map)
 
-def docx_to_csv(path):
-    # Load the first table from your document. In your example file,
-    # there is only one table, so I just grab the first one.
+def parse_docx(path):
+    my_bar = st.progress(0, text="Processing...")
     try:
-        document = Document(path)
+        text = docx2txt.process(path)
     except:
-        return "Not a valid docx file", pd.DataFrame()
-    try:
-        table = document.tables[0]
-    except:
-        return "No table found", pd.DataFrame()
-    # Data will be a list of rows represented as dictionaries
-    # containing each row's data.
+        return "Error: File could not be read", None
+    start_line = text.index('Ende der Inhaltsangabe') + len('Ende der Inhaltsangabe')
+    my_text = text[start_line:]
     data = []
 
-    keys = None
-    for i in range(0, len(table.rows), 3):
-        dialogue = table.cell(i, 0).text
-        start_take = table.cell(i, 1).text
-        take_num = table.cell(i+1, 1).text
-        end_take = table.cell(i+2, 1).text
-        data.append({'dialogue': dialogue, 'start_take': start_take, 'take_num': take_num, 'end_take': end_take})
+    timestamps = re.findall(timestamp_pattern, my_text)
+    match = re.split(timestamp_pattern, my_text)
+    i = 0
 
-    takes = []
-    for take in data:
-        for line in take["dialogue"].split('\n'):
-            speaker = line.split(':')[0]
-            text = line.split(':')[1]
-            start_take = take["start_take"]
-            take_num = take["take_num"]
-            end_take = take["end_take"]
-            takes.append({'speaker': str.upper(replace_umlauts(speaker)), 'text': replace_umlauts(text), 'start_take': start_take, 'take_num': take_num, 'end_take': end_take})
+    for m in match:
+        # Capitalized alphanumeric string followed by a colon
+        line = [j for j in m.splitlines() if not j in ['\xa0', '', '\xa0 ']]
 
-    df = pd.DataFrame(takes)
-    return "OK", df
+        if not line or line[0].startswith("Take "):
+            continue
+        
+        if i >= len(timestamps):
+            break
+
+        start, end = timestamps[i], timestamps[i+1]
+        i += 2
+
+        while True:
+            if line == []:
+                break
+            if speaker_pattern.match(line[0]):
+                speaker = line[0][:-1]
+            elif num_pattern.match(line[0]):
+                res = {"speaker": "", "dialogue": "", "take_num": line[0], "start": start, "end": end}
+                data.append(res)
+                break
+            else:
+                break
+            dialogue = line[1]
+            next = 2
+            if next >= len(line):
+                res = {"speaker": speaker, "dialogue": dialogue, "take_num": take_num, "start": start, "end": end}
+                data.append(res)
+                break
+            if not re.match(speaker_pattern, line[2]) and not re.match(num_pattern, line[2]):
+                dialogue += line[2]
+                next = 3
+            if next >= len(line):
+                break
+            if re.match(num_pattern, line[next]):
+                take_num = line[next]
+                line = line[next+1:]
+            elif re.match(speaker_pattern, line[next]):
+                print("Multiple takes")
+                line = line[next:]
+
+            res = {"speaker": speaker, "dialogue": dialogue, "take_num": take_num, "start": start, "end": end}
+            data.append(res)
+        my_bar.progress(int(i/len(timestamps)*100))
+    return "OK", data
+
+def adapt_data(data):
+    df = pd.DataFrame(data)
+    df["notes"] = ""
+    for i, row in df.iterrows():
+        if row['take_num'][-1] in ['A','a','Ü','ü']:
+            df.at[i,'notes'] = replace_umlauts(row['take_num'][-1])
+            df.at[i,'take_num'] = row['take_num'][:-1]
+
+    for i, row in df.iterrows():
+        df.at[i,'speaker'] = replace_umlauts(row['speaker']).upper()
+        df.at[i,'dialogue'] = replace_umlauts(row['dialogue'])
+    
+    return df

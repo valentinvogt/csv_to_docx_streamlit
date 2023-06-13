@@ -1,36 +1,31 @@
-from collections import namedtuple
-import altair as alt
-from parse_docx import docx_to_csv
 import pandas as pd
 import streamlit as st
+from parse_docx import parse_docx, adapt_data
 
 #importing required libraries
 
 import streamlit as st
 
-from io import StringIO 
-
-@st.experimental_memo
+@st.cache_data
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
 file = st.file_uploader("Please choose a file")
 
 if file is not None:
-
-   status, df = docx_to_csv(file)
+   status, data = parse_docx(file)
    if status != "OK":
       st.error(status)
       st.stop()
 
-   csv = convert_df(df)
+   csv = convert_df(adapt_data(data))
 
    st.success("CSV file successfully created!")
 
    st.download_button(
       "Press to Download",
       csv,
-      "file.csv",
+      f"{file.name[:-5]}.csv",
       "text/csv",
       key='download-csv'
    )
