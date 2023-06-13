@@ -20,10 +20,11 @@ file = st.file_uploader("Please choose a file")
 
 if file is not None:
    #Can be used wherever a "file-like" object is accepted:
-   df = docx_to_csv(file)
-
-   print(docx_to_csv(file))
-
+   status, df = docx_to_csv(file)
+   if status != "OK":
+      st.write(status)
+      st.stop()
+      
    st.write(df)
 
    csv = convert_df(df)

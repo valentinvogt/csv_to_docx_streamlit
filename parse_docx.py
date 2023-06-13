@@ -17,7 +17,10 @@ def replace_umlauts(text: str) -> str:
 def docx_to_csv(path):
     # Load the first table from your document. In your example file,
     # there is only one table, so I just grab the first one.
-    document = Document(path)
+    try:
+        document = Document(path)
+    except:
+        return "Not a valid docx file", pd.DataFrame()
     table = document.tables[0]
 
     # Data will be a list of rows represented as dictionaries
@@ -43,4 +46,4 @@ def docx_to_csv(path):
             takes.append({'speaker': str.upper(replace_umlauts(speaker)), 'text': replace_umlauts(text), 'start_take': start_take, 'take_num': take_num, 'end_take': end_take})
 
     df = pd.DataFrame(takes)
-    return df
+    return "OK", df
