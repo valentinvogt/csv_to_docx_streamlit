@@ -1,6 +1,6 @@
 from collections import namedtuple
 import altair as alt
-import math
+from parse_docx import docx_to_csv
 import pandas as pd
 import streamlit as st
 
@@ -9,8 +9,6 @@ import streamlit as st
 import streamlit as st
 
 from io import StringIO 
-
-
 
 @st.experimental_memo
 def convert_df(df):
@@ -22,26 +20,27 @@ file = st.file_uploader("Please choose a file")
 
 if file is not None:
 
-    #To convert to a string based IO:
+   #To convert to a string based IO:
 
-    stringio = StringIO(file.getvalue().decode("utf-8"))
+   stringio = StringIO(file.getvalue().decode("utf-8"))
 
-    #To read file as string:
+   #To read file as string:
 
-    string_data = stringio.read()
+   string_data = stringio.read()
 
-    #Can be used wherever a "file-like" object is accepted:
+   #Can be used wherever a "file-like" object is accepted:
+   df = docx_to_csv(string_data)
 
-    df= pd.read_csv(file)
+   print(docx_to_csv(string_data))
 
-    st.write(df)
+   st.write(df)
 
-    csv = convert_df(df)
+   csv = convert_df(df)
 
-    st.download_button(
-    "Press to Download",
-    csv,
-    "file.csv",
-    "text/csv",
-    key='download-csv'
-    )
+   st.download_button(
+      "Press to Download",
+      csv,
+      "file.csv",
+      "text/csv",
+      key='download-csv'
+   )
