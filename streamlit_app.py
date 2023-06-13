@@ -12,35 +12,23 @@ from io import StringIO
 
 
 
+@st.experimental_memo
+def convert_df(df):
+   return df.to_csv(index=False).encode('utf-8')
+
 #adding a file uploader
 
 file = st.file_uploader("Please choose a file")
 
 if file is not None:
 
-    #To read file as bytes:
-
-    bytes_data = file.getvalue()
-
-    st.write(bytes_data)
-
-
-
     #To convert to a string based IO:
 
     stringio = StringIO(file.getvalue().decode("utf-8"))
 
-    st.write(stringio)
-
-
-
     #To read file as string:
 
     string_data = stringio.read()
-
-    st.write(string_data)
-
-
 
     #Can be used wherever a "file-like" object is accepted:
 
@@ -48,4 +36,12 @@ if file is not None:
 
     st.write(df)
 
-    st.download_button('Download CSV', df, 'text/csv')
+    csv = convert_df(df)
+
+    st.download_button(
+    "Press to Download",
+    csv,
+    "file.csv",
+    "text/csv",
+    key='download-csv'
+    )
