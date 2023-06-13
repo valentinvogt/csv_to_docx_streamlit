@@ -14,20 +14,18 @@ from io import StringIO
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
-#adding a file uploader
-
 file = st.file_uploader("Please choose a file")
 
 if file is not None:
-   #Can be used wherever a "file-like" object is accepted:
+
    status, df = docx_to_csv(file)
    if status != "OK":
       st.error(status)
       st.stop()
 
-   st.write(df)
-
    csv = convert_df(df)
+
+   st.success("CSV file successfully created!")
 
    st.download_button(
       "Press to Download",

@@ -21,8 +21,10 @@ def docx_to_csv(path):
         document = Document(path)
     except:
         return "Not a valid docx file", pd.DataFrame()
-    table = document.tables[0]
-
+    try:
+        table = document.tables[0]
+    except:
+        return "No table found", pd.DataFrame()
     # Data will be a list of rows represented as dictionaries
     # containing each row's data.
     data = []
