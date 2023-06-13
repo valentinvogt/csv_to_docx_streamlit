@@ -22,9 +22,9 @@ if file is not None:
    #Can be used wherever a "file-like" object is accepted:
    status, df = docx_to_csv(file)
    if status != "OK":
-      st.write(status)
+      st.error(status)
       st.stop()
-      
+
    st.write(df)
 
    csv = convert_df(df)
