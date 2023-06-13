@@ -47,3 +47,5 @@ if file is not None:
     df= pd.read_csv(file)
 
     st.write(df)
+
+    st.download_button('Download CSV', df, 'text/csv')
