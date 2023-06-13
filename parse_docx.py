@@ -84,14 +84,16 @@ def parse_docx(path):
 
 def adapt_data(data):
     df = pd.DataFrame(data)
-    df["notes"] = ""
+    df["Typ"] = ""
     for i, row in df.iterrows():
         if row['take_num'][-1] in ['A','a','Ü','ü']:
-            df.at[i,'notes'] = replace_umlauts(row['take_num'][-1])
+            df.at[i,'Typ'] = replace_umlauts(row['take_num'][-1])
             df.at[i,'take_num'] = row['take_num'][:-1]
 
-    for i, row in df.iterrows():
+        df.at[i,'take_num'] = int(row['take_num'].split('/')[1])
         df.at[i,'speaker'] = replace_umlauts(row['speaker']).upper()
         df.at[i,'dialogue'] = replace_umlauts(row['dialogue'])
-    
+
+    df.columns = ['Rolle', 'Text', 'TakeNr', 'In', 'Out', 'Typ']
+    df = df[['TakeNr', 'In', 'Out', 'Typ', 'Rolle', 'Text']]
     return df
