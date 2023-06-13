@@ -90,7 +90,7 @@ def adapt_data(data):
             df.at[i,'Typ'] = replace_umlauts(row['take_num'][-1])
             df.at[i,'take_num'] = row['take_num'][:-1]
 
-        df.at[i,'take_num'] = int(row['take_num'].split('/')[1])
+        df.at[i,'take_num'] = int(df.at[i,'take_num'].split('/')[1])
         df.at[i,'speaker'] = replace_umlauts(row['speaker']).upper()
         df.at[i,'dialogue'] = replace_umlauts(row['dialogue'])
 
