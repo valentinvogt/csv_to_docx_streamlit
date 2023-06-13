@@ -31,7 +31,7 @@ if file is not None:
    #Can be used wherever a "file-like" object is accepted:
    df = docx_to_csv(string_data)
 
-   print(docx_to_csv(string_data))
+   print(docx_to_csv(file))
 
    st.write(df)
 
