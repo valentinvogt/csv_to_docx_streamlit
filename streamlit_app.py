@@ -19,17 +19,8 @@ def convert_df(df):
 file = st.file_uploader("Please choose a file")
 
 if file is not None:
-
-   #To convert to a string based IO:
-
-   stringio = StringIO(file.getvalue().decode("utf-8"))
-
-   #To read file as string:
-
-   string_data = stringio.read()
-
    #Can be used wherever a "file-like" object is accepted:
-   df = docx_to_csv(string_data)
+   df = docx_to_csv(file)
 
    print(docx_to_csv(file))
 
