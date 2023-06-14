@@ -56,13 +56,6 @@ def parse_docx_table(my_text):
         tuple: A tuple containing the status message and the extracted data.
     """
     my_bar = st.progress(0, text="Processing...")
-    # try:
-    #     text = docx2txt.process(path)
-    # except:
-    #     return "Error: File could not be read", None
-    
-    # start_line = text.index('Ende der Inhaltsangabe') + len('Ende der Inhaltsangabe')
-    # my_text = text[start_line:]
     data = []
 
     timestamps = re.findall(timestamp_pattern, my_text)
@@ -119,9 +112,12 @@ def parse_docx_table(my_text):
                 break
             
         my_bar.progress(int(i/len(timestamps)*100))
+
     return "OK", data
 
 def parse_docx_bar(my_text):
+    my_bar = st.progress(0, text="Processing...")
+
     timestamps = []
     for i in re.findall(time_duration_pattern, my_text):
         a,b = i.split(' - ')
@@ -132,6 +128,7 @@ def parse_docx_bar(my_text):
     data = []
     i = 0
     for m in match:
+        my_bar.progress(int(i/len(timestamps)*100)) 
         line = [j for j in m.splitlines() if not j in ['\xa0', '', '\xa0 ']]
         if not line or line[0].startswith("Take ") or line == [' - ']:
             continue
