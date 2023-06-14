@@ -34,7 +34,7 @@ def parse_docx(path):
         if stripped != '':
             first_table_text = i.text
             break
-        
+
     print(first_table_text)
     start_line = text.index(first_table_text) - 1
     my_text = text[start_line:]
@@ -109,7 +109,7 @@ def parse_docx_table(my_text):
                 take_num = line[next]
                 line = line[next+1:]
             elif re.match(speaker_pattern, line[next]):
-                print("Multiple takes")
+                # print("Multiple takes")
                 line = line[next:]
 
             res = {"speaker": speaker, "dialogue": dialogue, "take_num": take_num, "start": start, "end": end}
@@ -203,5 +203,4 @@ def adapt_data(data):
 
     df.columns = ['Rolle', 'Text', 'TakeNr', 'In', 'Out', 'Typ']
     df = df[['TakeNr', 'In', 'Out', 'Typ', 'Rolle', 'Text']]
-    print(df.head())
     return df
