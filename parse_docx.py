@@ -34,7 +34,8 @@ def parse_docx(path):
         if stripped != '':
             first_table_text = i.text
             break
-
+        
+    print(first_table_text)
     start_line = text.index(first_table_text) - 1
     my_text = text[start_line:]
     if re.search(r'\d+:\d+:\d+:\d+', my_text) is None:
