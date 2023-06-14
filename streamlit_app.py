@@ -10,7 +10,8 @@ import streamlit as st
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
-file = st.file_uploader("Please choose a file")
+st.title('DOCX to CSV')
+file = st.file_uploader("Please choose a .docx file (not .doc)")
 
 if file is not None:
    status, data = parse_docx(file)
@@ -23,7 +24,7 @@ if file is not None:
    st.success("CSV file successfully created!")
 
    st.download_button(
-      "Press to Download",
+      "Download",
       csv,
       f"{file.name[:-5]}.csv",
       "text/csv",
