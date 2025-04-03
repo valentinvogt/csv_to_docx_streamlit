@@ -1,5 +1,0 @@
-altair
-pandas
-streamlit
-python-docx
-docx2txt
