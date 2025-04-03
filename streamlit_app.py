@@ -1,6 +1,5 @@
-import pandas as pd
 import streamlit as st
-from parse_docx import parse_docx, adapt_data
+from src.parse_docx import parse_docx, adapt_data
 
 
 @st.cache_data

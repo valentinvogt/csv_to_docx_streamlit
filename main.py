@@ -1,5 +1,5 @@
 import pandas as pd
-from parse_docx import parse_docx, adapt_data
+from src.parse_docx import parse_docx, adapt_data
 import os
 import glob
 
