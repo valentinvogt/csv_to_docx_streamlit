@@ -7,7 +7,7 @@ def convert_df(df):
     return df.to_csv(index=False).encode("utf-8")
 
 
-st.title("DOCX to CSV")
+st.title("Synchronbuch Converter")
 file = st.file_uploader("Please choose a .docx file (not .doc)")
 
 if file is not None:
